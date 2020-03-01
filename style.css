@@ -1,0 +1,13 @@
+.field {
+  position: absolute;
+  background: #999;
+  border: 1px solid #000;
+}
+
+.snake-element {
+  position: absolute;
+  z-index: 1;
+  background: #0b0;
+  border: .5px solid #999;
+  box-sizing: border-box;
+}

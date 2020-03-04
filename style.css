@@ -1,6 +1,14 @@
+html,body {
+  transform-origin: 50% 50%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: #111C31;
+}
+
 .field {
   position: absolute;
-  background: #999;
+  background: #d8d8d8;
   border: 1px solid #000;
 }
 
@@ -8,6 +16,42 @@
   position: absolute;
   z-index: 1;
   background: #0b0;
-  border: .5px solid #999;
+  border: .5px solid #d8d8d8;
   box-sizing: border-box;
+}
+
+.stats {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-around;
+  background: #f00;
+  height: 60px;
+  border: 1px solid #000;
+}
+
+.points {
+  margin: 0;
+  color: #fff;
+  font-size: 1.4em;
+}
+
+.best-score {
+  margin: 0;
+  color: #fff;
+  font-size: 1.4em;
+}
+
+.play-button {
+    right: 0;
+    width: 100px;
+    height: 50px;
+    background-color: #d8d8d8;
+    color: #000;
+    font-size: 1.3em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    cursor: pointer;
 }

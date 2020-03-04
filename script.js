@@ -15,7 +15,7 @@ class Field {
 
     div.style.left = this.offsetX + this.gridSize * x + 'px';
     div.style.top = this.offsetY + this.gridSize * y + 'px';
-    div.style.width = this.gridSize * w + 'px';
+    div.style.width = this.gridSize * w +'px';
     div.style.height = this.gridSize * h + 'px';
 
     document.body.append(div);
@@ -65,6 +65,15 @@ class Snake {
     const delta = Snake.DELTAS[this.direction];
     const x = this.elements[0].x + delta.x;
     const y = this.elements[0].y + delta.y;
+    
+    if (game.snake.elements[0].x == game.apples[0].x && game.snake.elements[0].y == game.apples[0].y) {
+      game.removeApple();
+    }
+    
+    if (x >= game.field.width || y == game.field.height || x < 0 || y < 0) {
+      game.gameOver();
+      return
+    }
 
     this.createElement(x, y);
 
@@ -87,7 +96,7 @@ const stats = (width, height, gridSize, offsetX, offsetY) => {
 
   const pPoints = document.createElement('p');
   pPoints.className = 'points';
-  pPoints.innerHTML = 'Current score: 0';
+  pPoints.innerHTML = `Current score: 0`;
 
   const pBestScore = document.createElement('p');
   pBestScore.className = 'best-score';
@@ -104,7 +113,10 @@ const stats = (width, height, gridSize, offsetX, offsetY) => {
   document.body.append(statsDiv);
 
   const stats = {
-    stats: statsDiv
+    stats: statsDiv,
+    pPoints: pPoints,
+    pBestScore: pBestScore,
+    playButton: playButton
   }
   return stats;
 }
@@ -118,13 +130,64 @@ class Game {
     this.offsetY = offsetY;
     this.length = snakeLength;
     this.keys = [];
+    this.apples = [];
+    this.points = 0;
+    this.bestScore = 0;
     this.field = new Field(this.width, this.height, this.gridSize, this.offsetX, this.offsetY);
     this.snake = new Snake(this.field, this.length);
     this.stats = stats(width, height, gridSize, offsetX, offsetY);
-    this.playButton = document.getElementsByClassName('play-button')[0];
 
     this.start = this.start.bind(this);
     this.handleKeyPress = this.handleKeyPress.bind(this);
+  }
+
+  removeApple() {
+    this.apples.shift().div.remove();
+    this.createApple();
+    this.updateStats();
+  }
+
+  updateStats() {
+    this.points++;
+    this.stats.pPoints.innerHTML = `Current score: ${this.points}`;
+
+    if (this.points > this.bestScore) {
+      this.bestScore = this.points;
+      this.stats.pBestScore.innerHTML = `Best score: ${this.bestScore}`
+    }
+  }
+
+  createApple() {
+    let x = 0;
+    let y = 0;
+    
+    let isValid = true;
+
+    do {
+      const randomX = Math.floor(Math.random() * this.width);
+      const randomY = Math.floor(Math.random() * this.height);
+      for (let i = 0; i < this.snake.elements.length; i++) {
+        if (randomX === this.snake.elements[i].x && randomY === this.snake.elements[i].y) {
+          isValid = false;
+          break;
+        } else {
+          isValid = true;
+        }
+      }
+      x = randomX;
+      y = randomY;
+    } while (isValid === false)
+
+    const div = this.field.render('apple', x, y);
+    document.body.append(div);
+
+    const apple = {
+      div: div,
+      x: x,
+      y: y,
+    };
+
+    this.apples.push(apple);
   }
   
   handleKeyPress(e) {
@@ -137,47 +200,36 @@ class Game {
     }
     const key = this.keys.shift();
     const direction = this.snake.direction;
-    switch (key) {
-      case 'ArrowUp':
-        if (direction == Snake.DOWN) {
-          return
-        }
-        this.snake.direction = Snake.UP;
-        break;
-      case 'ArrowDown':
-        if (direction == Snake.UP) {
-          return
-        }
-        this.snake.direction = Snake.DOWN;
-        break;
-      case 'ArrowRight':
-        if (direction == Snake.LEFT) {
-          return
-        }
-        this.snake.direction = Snake.RIGHT;
-        break;
-      case 'ArrowLeft':
-        if (direction == Snake.RIGHT) {
-          return
-        }
-        this.snake.direction = Snake.LEFT;
-        break;
+    if (key == 'ArrowUp' && direction != Snake.DOWN) {
+      this.snake.direction = Snake.UP;
+    } else if (key == 'ArrowDown' && direction != Snake.UP) {
+      this.snake.direction = Snake.DOWN;
+    } else if (key == 'ArrowLeft' && direction != Snake.RIGHT) {
+      this.snake.direction = Snake.LEFT;
+    } else if (key == 'ArrowRight' && direction != Snake.LEFT) {
+      this.snake.direction = Snake.RIGHT;
     }
   }
 
+  gameOver() {
+    clearInterval(this.interval);
+  }
+
   inactivePlayButton() {
-    game.playButton.removeEventListener('click', game.start);
-    this.playButton.style.color = '#f00';
-    this.playButton.innerHTML = 'Good luck!';
-    this.playButton.style.cursor = 'default';
+    const button = this.stats.playButton;
+    button.removeEventListener('click', game.start);
+    button.style.color = '#f00';
+    button.innerHTML = 'Good luck!';
+    button.style.cursor = 'default';
   }
 
   start() {
     this.interval = setInterval(this.snake.move, 200);
     this.inactivePlayButton();
     document.addEventListener('keydown', this.handleKeyPress);
+    this.createApple();
   }
 }
 
 const game = new Game(15, 15, 30, 50, 50, 3);
-game.playButton.addEventListener('click', game.start);
+game.stats.playButton.addEventListener('click', game.start);

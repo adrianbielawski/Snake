@@ -20,6 +20,13 @@ html,body {
   box-sizing: border-box;
 }
 
+.apple {
+  position: absolute;
+  border-radius: 50%;
+  z-index: 1;
+  background: #347400;
+}
+
 .stats {
   position: absolute;
   display: inline-flex;

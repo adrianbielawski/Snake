@@ -46,7 +46,6 @@ class Snake {
       Math.floor(field.height / 2),
     );
 
-    this.createElement = this.createElement.bind(this);
     this.move = this.move.bind(this);
   }
 
@@ -61,6 +60,8 @@ class Snake {
   }
 
   move() {
+    game.checkKeys();
+
     const delta = Snake.DELTAS[this.direction];
     const x = this.elements[0].x + delta.x;
     const y = this.elements[0].y + delta.y;
@@ -116,12 +117,52 @@ class Game {
     this.offsetX = offsetX;
     this.offsetY = offsetY;
     this.length = snakeLength;
+    this.keys = [];
     this.field = new Field(this.width, this.height, this.gridSize, this.offsetX, this.offsetY);
     this.snake = new Snake(this.field, this.length);
     this.stats = stats(width, height, gridSize, offsetX, offsetY);
     this.playButton = document.getElementsByClassName('play-button')[0];
 
     this.start = this.start.bind(this);
+    this.handleKeyPress = this.handleKeyPress.bind(this);
+  }
+  
+  handleKeyPress(e) {
+    this.keys.push(e.key);
+  }
+
+  checkKeys() {
+    if (this.keys.length === 0) {
+      return
+    }
+    const key = this.keys.shift();
+    const direction = this.snake.direction;
+    switch (key) {
+      case 'ArrowUp':
+        if (direction == Snake.DOWN) {
+          return
+        }
+        this.snake.direction = Snake.UP;
+        break;
+      case 'ArrowDown':
+        if (direction == Snake.UP) {
+          return
+        }
+        this.snake.direction = Snake.DOWN;
+        break;
+      case 'ArrowRight':
+        if (direction == Snake.LEFT) {
+          return
+        }
+        this.snake.direction = Snake.RIGHT;
+        break;
+      case 'ArrowLeft':
+        if (direction == Snake.RIGHT) {
+          return
+        }
+        this.snake.direction = Snake.LEFT;
+        break;
+    }
   }
 
   inactivePlayButton() {
@@ -134,6 +175,7 @@ class Game {
   start() {
     this.interval = setInterval(this.snake.move, 200);
     this.inactivePlayButton();
+    document.addEventListener('keydown', this.handleKeyPress);
   }
 }
 

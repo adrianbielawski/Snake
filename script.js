@@ -45,8 +45,6 @@ class Snake {
       Math.floor(field.width / 2),
       Math.floor(field.height / 2),
     );
-
-    this.move = this.move.bind(this);
   }
 
   createElement(x, y) {
@@ -59,7 +57,7 @@ class Snake {
     });
   }
 
-  move() {
+  move = () => {
     game.checkKeys();
 
     const delta = Snake.DELTAS[this.direction];
@@ -152,10 +150,6 @@ class Game {
     this.field = new Field(this.width, this.height, this.gridSize, this.offsetX, this.offsetY);
     this.snake = new Snake(this.field, this.length);
     this.stats = stats(width, height, gridSize, offsetX, offsetY);
-
-    this.start = this.start.bind(this);
-    this.handleKeyPress = this.handleKeyPress.bind(this);
-    this.restartGame = this.restartGame.bind(this);
   }
 
   removeApple() {
@@ -208,7 +202,7 @@ class Game {
     this.apples.push(apple);
   }
   
-  handleKeyPress(e) {
+  handleKeyPress = (e) => {
     this.keys.push(e.key);
   }
 
@@ -271,7 +265,7 @@ class Game {
     button.style.cursor = 'default';
   }
 
-  restartGame() {
+  restartGame = () => {
     for (let i = 0; i < this.snake.elements.length; i++) {
       this.snake.elements[i].div.remove();
     }
@@ -284,7 +278,7 @@ class Game {
     this.start();
   }
 
-  start() {
+  start = () => {
     this.interval = setInterval(this.snake.move, 200);
     this.inactivePlayButton();
     document.addEventListener('keydown', this.handleKeyPress);
@@ -294,6 +288,3 @@ class Game {
 
 const game = new Game(15, 15, 30, 50, 50, 15);
 game.stats.playButton.addEventListener('click', game.start);
-/*
-
-    */

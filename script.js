@@ -47,7 +47,7 @@ class Snake {
     );
   }
 
-  createElement(x, y) {
+  createElement = (x, y) => {
     const div = this.field.render('snake-element', x, y);
 
     this.elements.unshift({
@@ -57,29 +57,14 @@ class Snake {
     });
   }
 
-  move = () => {
-    game.checkKeys();
-
+  getNextPosition = () => {
     const delta = Snake.DELTAS[this.direction];
     const x = this.elements[0].x + delta.x;
     const y = this.elements[0].y + delta.y;
-    
-    if (game.snake.elements[0].x == game.apples[0].x && game.snake.elements[0].y == game.apples[0].y) {
-      game.removeApple();
-    }
-    
-    if (x >= game.field.width || y == game.field.height || x < 0 || y < 0) {
-      game.gameOver();
-      return
-    }
+    return [x, y];
+  }
 
-    for (let i = 1; i < game.snake.elements.length; i++) {
-      if (x  === game.snake.elements[i].x && y  === game.snake.elements[i].y) {
-        game.gameOver();
-        return
-      }
-    }
-
+  move = (x, y) => {
     this.createElement(x, y);
 
     if (this.elements.length > this.length) {
@@ -161,6 +146,42 @@ class Game {
     this.stats = stats(width, height, gridSize, offsetX, offsetY);
   }
 
+  isValidMove(x, y) {
+    if (x >= this.field.width || y >= this.field.height || x < 0 || y < 0) {
+      return false
+    }
+
+    for (let i = 1; i < this.snake.elements.length; i++) {
+      console.log(this.snake.elements[i].x);
+      if (x == this.snake.elements[i].x && y == this.snake.elements[i].y) {
+        return false
+      }
+    }
+    return true
+  }
+
+  gameLoop = () => {
+    this.checkKeys();
+    const nextPosition = this.snake.getNextPosition();
+    const x = nextPosition[0];
+    const y = nextPosition[1];
+    console.log(y)
+
+    if (this.isValidMove(x, y)) {
+      this.snake.move(x, y);
+    } else {
+      this.gameOver();
+      return
+    }
+    
+    
+    
+    if (this.snake.elements[0].x == this.apples[0].x && this.snake.elements[0].y == this.apples[0].y) {
+      this.removeApple();
+    }
+
+  }
+
   removeApple() {
     this.apples.shift().div.remove();
     this.createApple();
@@ -237,7 +258,7 @@ class Game {
     if (fieldHeight <= 170) {
       this.stats.gameOverMessage.style.fontSize = '26px';
     }
-    
+
     if (this.points > this.oldBestScore) {
       this.oldBestScore = this.points;
       this.newRecord();
@@ -260,6 +281,9 @@ class Game {
 
   newRecord() {
     this.stats.gameOverMessage.innerHTML = `New record ${this.points} points`;
+    if (this.points == 1) {
+      this.stats.gameOverMessage.innerHTML = `New record ${this.points} point`;
+    }
     this.stats.gameOverMessage.style.display = 'flex';
   }
 
@@ -289,12 +313,12 @@ class Game {
     this.points = 0;
     this.stats.pPoints.innerHTML = `Current score: ${this.points}`;
     document.getElementsByClassName('game-over-message')[0].style = 'none';
-    this.interval = setInterval(this.snake.move, 200);
+    this.interval = setInterval(this.gameLoop, 200);
     this.inactivePlayButton();
     document.addEventListener('keydown', this.handleKeyPress);
     this.createApple();
   }
 }
 
-const game = new Game(5, 5, 20, 50, 50, 15);
+const game = new Game(21, 20, 20, 50, 50, 15);
 game.stats.button.addEventListener('click', game.start);

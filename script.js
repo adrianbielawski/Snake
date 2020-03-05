@@ -251,7 +251,7 @@ class Game {
 
   activePlayButton() {
     const button = this.stats.playButton;
-    button.addEventListener('click', this.restartGame);
+    button.addEventListener('click', this.start);
     button.style.color = '#000';
     button.innerHTML = 'Play again';
     button.style.cursor = 'pointer';
@@ -265,20 +265,18 @@ class Game {
     button.style.cursor = 'default';
   }
 
-  restartGame = () => {
+  start = () => {
     for (let i = 0; i < this.snake.elements.length; i++) {
       this.snake.elements[i].div.remove();
     }
+    if (this.apples.length > 0) {
+      this.apples.shift().div.remove();
+    }
     this.length = this.startLength;
     this.snake = new Snake(this.field, this.length);
-    this.apples.shift().div.remove();
     this.points = 0;
     this.stats.pPoints.innerHTML = `Current score: ${this.points}`;
     document.getElementsByClassName('game-over-message')[0].style = 'none';
-    this.start();
-  }
-
-  start = () => {
     this.interval = setInterval(this.snake.move, 200);
     this.inactivePlayButton();
     document.addEventListener('keydown', this.handleKeyPress);

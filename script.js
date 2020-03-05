@@ -61,7 +61,7 @@ class Snake {
     const delta = Snake.DELTAS[this.direction];
     const x = this.elements[0].x + delta.x;
     const y = this.elements[0].y + delta.y;
-    return [x, y];
+    return {x, y};
   }
 
   move = (x, y) => {
@@ -152,7 +152,6 @@ class Game {
     }
 
     for (let i = 1; i < this.snake.elements.length; i++) {
-      console.log(this.snake.elements[i].x);
       if (x == this.snake.elements[i].x && y == this.snake.elements[i].y) {
         return false
       }
@@ -163,23 +162,17 @@ class Game {
   gameLoop = () => {
     this.checkKeys();
     const nextPosition = this.snake.getNextPosition();
-    const x = nextPosition[0];
-    const y = nextPosition[1];
-    console.log(y)
 
-    if (this.isValidMove(x, y)) {
-      this.snake.move(x, y);
+    if (this.isValidMove(nextPosition.x, nextPosition.y)) {
+      this.snake.move(nextPosition.x, nextPosition.y);
     } else {
       this.gameOver();
       return
-    }
-    
-    
+    }    
     
     if (this.snake.elements[0].x == this.apples[0].x && this.snake.elements[0].y == this.apples[0].y) {
       this.removeApple();
     }
-
   }
 
   removeApple() {

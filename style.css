@@ -10,11 +10,14 @@ html,body {
   position: absolute;
   background: #d8d8d8;
   border: 1px solid #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .snake-element {
   position: absolute;
-  z-index: 1;
+  z-index: 2;
   background: #0b0;
   border: .5px solid #d8d8d8;
   box-sizing: border-box;
@@ -61,4 +64,12 @@ html,body {
     justify-content: center;
     text-align: center;
     cursor: pointer;
+}
+
+.game-over-message {
+  display: none;
+  z-index: 30;
+  font-size: 3em;
+  font-weight: 700;
+  color: #00d;
 }

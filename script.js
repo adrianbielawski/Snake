@@ -68,6 +68,8 @@ class Snake {
     
     if (game.snake.elements[0].x == game.apples[0].x && game.snake.elements[0].y == game.apples[0].y) {
       game.removeApple();
+      game.removeObstacle();
+
     }
     
     if (x >= game.field.width || y == game.field.height || x < 0 || y < 0) {
@@ -131,6 +133,7 @@ class Game {
     this.length = snakeLength;
     this.keys = [];
     this.apples = [];
+    this.obstacles = [];
     this.points = 0;
     this.bestScore = 0;
     this.field = new Field(this.width, this.height, this.gridSize, this.offsetX, this.offsetY);
@@ -144,6 +147,12 @@ class Game {
   removeApple() {
     this.apples.shift().div.remove();
     this.createApple();
+    this.updateStats();
+  }
+
+  removeObstacle() {
+    this.obstacles.shift().div.remove();
+    this.createObstruction();
     this.updateStats();
   }
 
@@ -189,6 +198,39 @@ class Game {
 
     this.apples.push(apple);
   }
+
+  createObstruction() {
+    let x = 0;
+    let y = 0;
+    
+    let isValid = true;
+
+    do {
+      const randomX = Math.floor(Math.random() * this.width);
+      const randomY = Math.floor(Math.random() * this.height);
+      for (let i = 0; i < this.snake.elements.length; i++) {
+        if (randomX === this.snake.elements[i].x && randomY === this.snake.elements[i].y) {
+          isValid = false;
+          break;
+        } else {
+          isValid = true;
+        }
+      }
+      x = randomX;
+      y = randomY;
+    } while (isValid === false)
+
+    const div = this.field.render('obstacle', x, y);
+    document.body.append(div);
+
+    const obstacle = {
+      div: div,
+      x: x,
+      y: y,
+    };
+
+    this.obstacles.push(obstacle);
+  }
   
   handleKeyPress(e) {
     this.keys.push(e.key);
@@ -228,6 +270,7 @@ class Game {
     this.inactivePlayButton();
     document.addEventListener('keydown', this.handleKeyPress);
     this.createApple();
+    this.createObstruction();
   }
 }
 

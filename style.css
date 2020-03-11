@@ -27,6 +27,13 @@ html,body {
   background: #347400;
 }
 
+.obstacle {
+  position: absolute;
+  border-radius: 50%;
+  z-index: 1;
+  background: #e60e0e;
+}
+
 .stats {
   position: absolute;
   display: inline-flex;

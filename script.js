@@ -143,7 +143,7 @@ const stats = (width, height, gridSize, offsetX, offsetY, border) => {
 }
 
 class Game {
-  constructor(width, height, gridSize, offsetX, offsetY, snakeLength, border) {
+  constructor(width, height, gridSize, offsetX, offsetY, snakeLength, border, level) {
     this.width = width;
     this.height = height;
     this.gridSize = gridSize;
@@ -157,9 +157,23 @@ class Game {
     this.points = 0;
     this.bestScore = 0;
     this.oldBestScore = 0;
+    this.level = level;
+    this.startSpeed = this.startSpeed();
+    this.currentSpeed = this.startSpeed;
     this.field = new Field(this.width, this.height, this.gridSize, this.offsetX, this.offsetY, this.border);
     this.snake = new Snake(this.field, this.length, this.gridSize, this.offsetX, this.offsetY);
     this.stats = stats(width, height, gridSize, offsetX, offsetY, border);
+  }
+
+  startSpeed() {
+    switch (this.level) {
+      case 'easy':
+        return 250;
+      case 'medium':
+        return 200;
+      case 'hard':
+        return 150;
+    }
   }
 
   isValidMove(x, y) {
@@ -198,6 +212,24 @@ class Game {
     this.createApple();
     this.updateStats();
     this.snake.length++;
+
+    if (this.points % 2 == 0) {
+      this.accelerateSnake();
+    }
+  }
+
+  accelerateSnake() {
+    clearInterval(this.interval);
+
+    if (this.level == 'easy') {
+      this.currentSpeed -= 3;
+    } else if (this.level == 'medium') {
+      this.currentSpeed -= 5;
+    } else if (this.level == 'hard') {
+      this.currentSpeed -= 8;
+    }
+    
+    this.interval = setInterval(this.gameLoop, this.currentSpeed);
   }
 
   updateStats() {
@@ -331,12 +363,13 @@ class Game {
     this.points = 0;
     this.stats.pPoints.innerHTML = `Current score: ${this.points}`;
     document.getElementsByClassName('game-over-message')[0].style = 'none';
-    this.interval = setInterval(this.gameLoop, 200);
+    this.currentSpeed = this.startSpeed;
+    this.interval = setInterval(this.gameLoop, this.startSpeed);
     this.inactivePlayButton();
     document.addEventListener('keydown', this.handleKeyPress);
     this.createApple();
   }
 }
 
-const game = new Game(20, 20, 20, 50, 50, 15, 1);
+const game = new Game(15, 15, 20, 50, 50, 15, 1, 'medium');
 game.stats.button.addEventListener('click', game.start);

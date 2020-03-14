@@ -39,43 +39,43 @@ html,body {
 }
 
 .points {
-  margin: 5px;
+  margin: 0 3px;
   color: #fff;
   font-size: 24px;
-  min-width: 155px;
+  min-width: 180px;
   line-height: 2em;
   display: flex;
   justify-content: space-around;
 }
 
 .best-score {
-  margin: 5px;
+  margin: 0 3px;
   color: #fff;
   font-size: 24px;
-  min-width: 125px;
+  min-width: 150px;
   line-height: 2em;
   display: flex;
   justify-content: space-around;
 }
 
 .button {
-    right: 0;
-    min-width: 100px;
-    max-width: 165px;
-    width: 25%;
-    height: 55px;
-    padding: 0;
-    margin: 5px;
-    outline: none;
-    background-color: #d8d8d8;
-    color: #000;
-    font-size: 22px;
-    line-height: 1.1em;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    cursor: pointer;
+  right: 0;
+  min-width: 100px;
+  max-width: 165px;
+  width: 25%;
+  height: 55px;
+  padding: 0;
+  margin: 5px;
+  outline: none;
+  background-color: #d8d8d8;
+  color: #000;
+  font-size: 22px;
+  line-height: 1.1em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
 }
 
 .button:disabled {

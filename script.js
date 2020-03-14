@@ -45,11 +45,9 @@ class Snake {
       Math.floor(field.width / 2),
       Math.floor(field.height / 2),
     );
-
-    this.move = this.move.bind(this);
   }
 
-  createElement(x, y) {
+  createElement = (x, y) => {
     const div = this.field.render('snake-element', x, y);
 
     this.elements.unshift({
@@ -59,29 +57,14 @@ class Snake {
     });
   }
 
-  move() {
-    game.checkKeys();
-
+  getNextPosition = () => {
     const delta = Snake.DELTAS[this.direction];
     const x = this.elements[0].x + delta.x;
     const y = this.elements[0].y + delta.y;
-    
-    if (game.snake.elements[0].x == game.apples[0].x && game.snake.elements[0].y == game.apples[0].y) {
-      game.removeApple();
-    }
-    
-    if (x >= game.field.width || y == game.field.height || x < 0 || y < 0) {
-      game.gameOver();
-      return
-    }
+    return {x, y};
+  }
 
-    for (let i = 1; i < game.snake.elements.length; i++) {
-      if (x  === game.snake.elements[i].x && y  === game.snake.elements[i].y) {
-        game.gameOver();
-        return
-      }
-    }
-
+  move = (x, y) => {
     this.createElement(x, y);
 
     if (this.elements.length > this.length) {
@@ -92,7 +75,6 @@ class Snake {
 }
 
 const stats = (width, height, gridSize, offsetX, offsetY) => {
-
   const statsDiv = document.createElement('div');
   const statsWidth = width * gridSize;
   const statsTop = height * gridSize + offsetY;
@@ -109,19 +91,29 @@ const stats = (width, height, gridSize, offsetX, offsetY) => {
   pBestScore.className = 'best-score';
   pBestScore.innerHTML = 'Best score: 0';
 
-  const playButton = document.createElement('div');
-  playButton.className = 'play-button';
-  playButton.innerHTML = 'Start new game';
+  const button = document.createElement('button');
+  button.className = 'button';
+  button.innerHTML = 'Start new game';
   
   const gameOverMessage = document.createElement('p');
   const field = document.body.getElementsByClassName('field')[0];
   gameOverMessage.className = 'game-over-message';
   gameOverMessage.style.display = 'none';
   
+  const fieldWidth = width * gridSize;
+
+  if (fieldWidth <= 150) {
+    pPoints.style.fontSize = '14px';
+    pBestScore.style.fontSize = '14px';
+    button.style.fontSize = '14px';
+    button.style.minWidth = '90%';
+    button.style.maxHeight = '45px';
+  }
+  
   field.appendChild(gameOverMessage);
   statsDiv.appendChild(pPoints);
   statsDiv.appendChild(pBestScore);
-  statsDiv.appendChild(playButton);
+  statsDiv.appendChild(button);
 
   document.body.append(statsDiv);
 
@@ -129,7 +121,7 @@ const stats = (width, height, gridSize, offsetX, offsetY) => {
     stats: statsDiv,
     pPoints: pPoints,
     pBestScore: pBestScore,
-    playButton: playButton,
+    button: button,
     gameOverMessage: gameOverMessage
   }
   return stats;
@@ -152,10 +144,35 @@ class Game {
     this.field = new Field(this.width, this.height, this.gridSize, this.offsetX, this.offsetY);
     this.snake = new Snake(this.field, this.length);
     this.stats = stats(width, height, gridSize, offsetX, offsetY);
+  }
 
-    this.start = this.start.bind(this);
-    this.handleKeyPress = this.handleKeyPress.bind(this);
-    this.restartGame = this.restartGame.bind(this);
+  isValidMove(x, y) {
+    if (x >= this.field.width || y >= this.field.height || x < 0 || y < 0) {
+      return false
+    }
+
+    for (let i = 1; i < this.snake.elements.length; i++) {
+      if (x == this.snake.elements[i].x && y == this.snake.elements[i].y) {
+        return false
+      }
+    }
+    return true
+  }
+
+  gameLoop = () => {
+    this.checkKeys();
+    const nextPosition = this.snake.getNextPosition();
+
+    if (this.isValidMove(nextPosition.x, nextPosition.y)) {
+      this.snake.move(nextPosition.x, nextPosition.y);
+    } else {
+      this.gameOver();
+      return
+    }    
+    
+    if (this.snake.elements[0].x == this.apples[0].x && this.snake.elements[0].y == this.apples[0].y) {
+      this.removeApple();
+    }
   }
 
   removeApple() {
@@ -208,7 +225,7 @@ class Game {
     this.apples.push(apple);
   }
   
-  handleKeyPress(e) {
+  handleKeyPress = (e) => {
     this.keys.push(e.key);
   }
 
@@ -230,6 +247,11 @@ class Game {
   }
 
   gameOver() {
+    const fieldHeight = this.height * this.gridSize;
+    if (fieldHeight <= 170) {
+      this.stats.gameOverMessage.style.fontSize = '26px';
+    }
+
     if (this.points > this.oldBestScore) {
       this.oldBestScore = this.points;
       this.newRecord();
@@ -245,55 +267,51 @@ class Game {
     this.activePlayButton();
   }
 
-  youLoose() {
-    this.stats.gameOverMessage.innerHTML = 'You lose :(';
+  youLoose = () => {
+    this.stats.gameOverMessage.innerHTML = `You lose <br> :(`;
     this.stats.gameOverMessage.style.display = 'flex';
   }
 
   newRecord() {
     this.stats.gameOverMessage.innerHTML = `New record ${this.points} points`;
+    if (this.points == 1) {
+      this.stats.gameOverMessage.innerHTML = `New record ${this.points} point`;
+    }
     this.stats.gameOverMessage.style.display = 'flex';
   }
 
   activePlayButton() {
-    const button = this.stats.playButton;
-    button.addEventListener('click', this.restartGame);
-    button.style.color = '#000';
+    const button = this.stats.button;
+    button.addEventListener('click', this.start);
+    button.disabled = false;
     button.innerHTML = 'Play again';
-    button.style.cursor = 'pointer';
   }
 
   inactivePlayButton() {
-    const button = this.stats.playButton;
+    const button = this.stats.button;
     button.removeEventListener('click', this.start);
-    button.style.color = '#f00';
+    button.disabled = true;
     button.innerHTML = 'Good luck!';
-    button.style.cursor = 'default';
   }
 
-  restartGame() {
+  start = () => {
     for (let i = 0; i < this.snake.elements.length; i++) {
       this.snake.elements[i].div.remove();
     }
+    if (this.apples.length > 0) {
+      this.apples.shift().div.remove();
+    }
     this.length = this.startLength;
     this.snake = new Snake(this.field, this.length);
-    this.apples.shift().div.remove();
     this.points = 0;
     this.stats.pPoints.innerHTML = `Current score: ${this.points}`;
     document.getElementsByClassName('game-over-message')[0].style = 'none';
-    this.start();
-  }
-
-  start() {
-    this.interval = setInterval(this.snake.move, 200);
+    this.interval = setInterval(this.gameLoop, 200);
     this.inactivePlayButton();
     document.addEventListener('keydown', this.handleKeyPress);
     this.createApple();
   }
 }
 
-const game = new Game(15, 15, 30, 50, 50, 15);
-game.stats.playButton.addEventListener('click', game.start);
-/*
-
-    */
+const game = new Game(21, 20, 20, 50, 50, 15);
+game.stats.button.addEventListener('click', game.start);

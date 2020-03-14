@@ -1,22 +1,24 @@
 class Field {
-  constructor(width, height, gridSize, offsetX, offsetY) {
+  constructor(width, height, gridSize, offsetX, offsetY, border) {
     this.width = width;
     this.height = height;
     this.gridSize = gridSize;
     this.offsetX = offsetX;
     this.offsetY = offsetY;
+    this.border = border;
 
-    const div = this.render('field', 0, 0, width, height);
+    const div = this.render('field', width, height, border);
   }
 
-  render(className, x, y, w = 1, h = 1) {
+  render(className, w, h) {
     const div = document.createElement('div');
     div.className = className;
 
-    div.style.left = this.offsetX + this.gridSize * x + 'px';
-    div.style.top = this.offsetY + this.gridSize * y + 'px';
+    div.style.left = this.offsetX - this.border + 'px';
+    div.style.top = this.offsetY - this.border + 'px';
     div.style.width = this.gridSize * w +'px';
     div.style.height = this.gridSize * h + 'px';
+    div.style.border = `${this.border}px solid #000`;
 
     document.body.append(div);
     return div;
@@ -36,19 +38,31 @@ class Snake {
     [Snake.DOWN]: {x: 0, y: 1},
   };
 
-  constructor(field, length) {
+  constructor(field, length, gridSize, offsetX, offsetY) {
     this.field = field;
     this.length = length;
+    this.gridSize = gridSize;
+    this.offsetX = offsetX;
+    this.offsetY = offsetY;
     this.direction = Snake.RIGHT;
     this.elements = [];
     this.createElement(
       Math.floor(field.width / 2),
       Math.floor(field.height / 2),
+      gridSize, offsetX, offsetY
     );
   }
+  createElement = (x, y, gridSize, offsetX, offsetY) => {
+    const div = document.createElement('div');
+    div.className = 'snake-element';
+  
 
-  createElement = (x, y) => {
-    const div = this.field.render('snake-element', x, y);
+    div.style.left = offsetX + gridSize * x + 'px';
+    div.style.top = offsetY + gridSize * y + 'px';
+    div.style.width = gridSize + 'px';
+    div.style.height = gridSize + 'px';
+
+    document.body.append(div);
 
     this.elements.unshift({
       x: x,
@@ -61,11 +75,11 @@ class Snake {
     const delta = Snake.DELTAS[this.direction];
     const x = this.elements[0].x + delta.x;
     const y = this.elements[0].y + delta.y;
-    return {x, y};
+    return [x, y];
   }
 
-  move = (x, y) => {
-    this.createElement(x, y);
+  move = (x, y, gridSize, offsetX, offsetY) => {
+    this.createElement(x, y, gridSize, offsetX, offsetY);
 
     if (this.elements.length > this.length) {
       const last = this.elements.pop();
@@ -74,14 +88,15 @@ class Snake {
   }
 }
 
-const stats = (width, height, gridSize, offsetX, offsetY) => {
+const stats = (width, height, gridSize, offsetX, offsetY, border) => {
   const statsDiv = document.createElement('div');
   const statsWidth = width * gridSize;
   const statsTop = height * gridSize + offsetY;
   statsDiv.className = 'stats';
   statsDiv.style.width = `${statsWidth}px`;
   statsDiv.style.top = `${statsTop}px`;
-  statsDiv.style.left = `${offsetX}px`;
+  statsDiv.style.left = offsetX - border + 'px';
+  statsDiv.style.border = `${border}px solid #000`;
 
   const pPoints = document.createElement('p');
   pPoints.className = 'points';
@@ -128,12 +143,13 @@ const stats = (width, height, gridSize, offsetX, offsetY) => {
 }
 
 class Game {
-  constructor(width, height, gridSize, offsetX, offsetY, snakeLength) {
+  constructor(width, height, gridSize, offsetX, offsetY, snakeLength, border) {
     this.width = width;
     this.height = height;
     this.gridSize = gridSize;
     this.offsetX = offsetX;
     this.offsetY = offsetY;
+    this.border = border;
     this.startLength = snakeLength;
     this.length = snakeLength;
     this.keys = [];
@@ -141,9 +157,9 @@ class Game {
     this.points = 0;
     this.bestScore = 0;
     this.oldBestScore = 0;
-    this.field = new Field(this.width, this.height, this.gridSize, this.offsetX, this.offsetY);
-    this.snake = new Snake(this.field, this.length);
-    this.stats = stats(width, height, gridSize, offsetX, offsetY);
+    this.field = new Field(this.width, this.height, this.gridSize, this.offsetX, this.offsetY, this.border);
+    this.snake = new Snake(this.field, this.length, this.gridSize, this.offsetX, this.offsetY);
+    this.stats = stats(width, height, gridSize, offsetX, offsetY, border);
   }
 
   isValidMove(x, y) {
@@ -162,13 +178,15 @@ class Game {
   gameLoop = () => {
     this.checkKeys();
     const nextPosition = this.snake.getNextPosition();
+    const x = nextPosition[0];
+    const y = nextPosition[1];
 
-    if (this.isValidMove(nextPosition.x, nextPosition.y)) {
-      this.snake.move(nextPosition.x, nextPosition.y);
+    if (this.isValidMove(x, y)) {
+      this.snake.move(x, y, this.gridSize, this.offsetX, this.offsetY);
     } else {
       this.gameOver();
       return
-    }    
+    }
     
     if (this.snake.elements[0].x == this.apples[0].x && this.snake.elements[0].y == this.apples[0].y) {
       this.removeApple();
@@ -192,7 +210,7 @@ class Game {
     }
   }
 
-  createApple() {
+  createApple() {    
     let x = 0;
     let y = 0;
     
@@ -212,8 +230,15 @@ class Game {
       x = randomX;
       y = randomY;
     } while (isValid === false)
+    
+    const div = document.createElement('div');
+    div.className = 'apple';  
 
-    const div = this.field.render('apple', x, y);
+    div.style.left = this.offsetX + this.gridSize * x + 'px';
+    div.style.top = this.offsetY + this.gridSize * y + 'px';
+    div.style.width = this.gridSize + 'px';
+    div.style.height = this.gridSize + 'px';
+
     document.body.append(div);
 
     const apple = {
@@ -313,5 +338,5 @@ class Game {
   }
 }
 
-const game = new Game(21, 20, 20, 50, 50, 15);
+const game = new Game(20, 20, 20, 50, 50, 15, 1);
 game.stats.button.addEventListener('click', game.start);

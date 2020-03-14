@@ -9,7 +9,6 @@ html,body {
 .field {
   position: absolute;
   background: #d8d8d8;
-  border: 1px solid #000;
   margin: 0;
   display: flex;
   align-items: center;
@@ -20,8 +19,6 @@ html,body {
   position: absolute;
   z-index: 2;
   background: #0b0;
-  border: .5px solid #d8d8d8;
-  box-sizing: border-box;
 }
 
 .apple {
@@ -39,7 +36,6 @@ html,body {
   justify-content: space-around;
   background: #f00;
   min-height: 60px;
-  border: 1px solid #000;
 }
 
 .points {

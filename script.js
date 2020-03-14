@@ -191,6 +191,7 @@ class Game {
 
   gameLoop = () => {
     this.checkKeys();
+    console.log(this.keys);
     const nextPosition = this.snake.getNextPosition();
     const x = nextPosition[0];
     const y = nextPosition[1];
@@ -283,6 +284,20 @@ class Game {
   }
   
   handleKeyPress = (e) => {
+    if (this.keys.length >= 2) {
+      return
+    }
+
+    if (this.snake.direction == Snake.UP && this.keys[0] == 'ArrowUp') {
+      this.keys.shift();
+    } else if (this.snake.direction == Snake.DOWN && this.keys[0] == 'ArrowDown') {
+      this.keys.shift();
+    } else if (this.snake.direction == Snake.LEFT && this.keys[0] == 'ArrowLeft') {
+      this.keys.shift();
+    } else if (this.snake.direction == Snake.RIGHT && this.keys[0] == 'ArrowRight') {
+      this.keys.shift();
+    }
+    
     this.keys.push(e.key);
   }
 
@@ -321,7 +336,7 @@ class Game {
     }
    
     clearInterval(this.interval);
-    this.activePlayButton();
+    this.enablePlayButton();
   }
 
   youLoose = () => {
@@ -337,14 +352,14 @@ class Game {
     this.stats.gameOverMessage.style.display = 'flex';
   }
 
-  activePlayButton() {
+  enablePlayButton() {
     const button = this.stats.button;
     button.addEventListener('click', this.start);
     button.disabled = false;
     button.innerHTML = 'Play again';
   }
 
-  inactivePlayButton() {
+  disablePlayButton() {
     const button = this.stats.button;
     button.removeEventListener('click', this.start);
     button.disabled = true;
@@ -361,15 +376,16 @@ class Game {
     this.length = this.startLength;
     this.snake = new Snake(this.field, this.length);
     this.points = 0;
+    this.keys = [];
     this.stats.pPoints.innerHTML = `Current score: ${this.points}`;
     document.getElementsByClassName('game-over-message')[0].style = 'none';
     this.currentSpeed = this.startSpeed;
     this.interval = setInterval(this.gameLoop, this.startSpeed);
-    this.inactivePlayButton();
+    this.disablePlayButton();
     document.addEventListener('keydown', this.handleKeyPress);
     this.createApple();
   }
 }
 
-const game = new Game(15, 15, 20, 50, 50, 15, 1, 'medium');
+const game = new Game(20, 20, 20, 50, 50, 15, 1, 'easy');
 game.stats.button.addEventListener('click', game.start);

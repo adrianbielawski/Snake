@@ -8,7 +8,7 @@ html,body {
 
 .field {
   position: absolute;
-  background: #d8d8d8;
+  background: #07aa07;
   margin: 0;
   display: flex;
   align-items: center;
@@ -18,23 +18,40 @@ html,body {
 .snake-element {
   position: absolute;
   z-index: 2;
-  background: #0b0;
-  border: 0.5px solid #d8d8d8;
+  background: #000;
+  border: 0.5px solid #07aa07;
   box-sizing: border-box;
 }
 
 .apple {
   position: absolute;
-  border-radius: 50%;
   z-index: 1;
-  background: #347400;
+  background-image: url(/apple.png);
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.strawberry {
+  position: absolute;
+  z-index: 1;
+  background-image: url(/strawberry.png);
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+.banana {
+  position: absolute;
+  z-index: 1;
+  background-image: url(/banana.png);
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 .obstacle {
   position: absolute;
-  background: #000;
   z-index: 1;
-  border-radius: 15%;
+  background-image: url(/rock.png);
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 .stats {
@@ -100,4 +117,6 @@ html,body {
   font-weight: 700;
   margin: 0;
   color: #00d;
+  background: rgba(102, 102, 102, 0.7);
+  border:1px solid #000;
 }

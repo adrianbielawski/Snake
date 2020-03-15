@@ -153,11 +153,12 @@ class Game {
     this.startLength = snakeLength;
     this.length = snakeLength;
     this.keys = [];
-    this.apples = [];
+    this.fruits = [];
     this.obstacles = [];
     this.points = 0;
     this.bestScore = 0;
     this.oldBestScore = 0;
+    this.removedFruits = 0;
     this.level = level.toLowerCase();
     this.startSpeed = this.startSpeed();
     this.currentSpeed = this.startSpeed;
@@ -209,19 +210,40 @@ class Game {
       return
     }
     
-    if (this.snake.elements[0].x == this.apples[0].x && this.snake.elements[0].y == this.apples[0].y) {
-      this.removeApple();
+    for (let i = 0; i < this.fruits.length; i++) {
+      if (x == this.fruits[i].x && y == this.fruits[i].y) {
+        this.removeFruit(i);
+      }
     }
   }
 
-  removeApple() {
-    this.apples.shift().div.remove();
-    this.createApple();
+  removeFruit(i) {
+    this.removedFruits++;
+    this.fruits[i].div.remove();
+    let removedFruit = this.fruits.splice([i], 1);
+
+    if (removedFruit[0].name == 'strawberry') {
+      clearTimeout(this.strawberryTimeout);
+    }
+
+    if (removedFruit[0].name == 'banana') {
+      clearTimeout(this.bananaTimeout);
+    }
+
+    let value = removedFruit[0].points;    
+
+    if (this.removedFruits % 4 == 0) {
+      this.createStrawberry();
+    } else if (this.removedFruits % 7 == 0) {
+      this.createBanana();
+    } else {
+      this.createApple();
+    }
     this.createObstacle();
-    this.updateStats();
+    this.updateStats(value);
     this.snake.length++;
 
-    if (this.points % 2 == 0) {
+    if (this.removedFruits % 2 == 0) {
       this.accelerateSnake();
     }
   }
@@ -230,18 +252,18 @@ class Game {
     clearInterval(this.interval);
 
     if (this.level == 'easy') {
-      this.currentSpeed -= 3;
+      this.currentSpeed -= 2;
     } else if (this.level == 'medium') {
-      this.currentSpeed -= 5;
+      this.currentSpeed -= 4;
     } else if (this.level == 'hard') {
-      this.currentSpeed -= 7;
+      this.currentSpeed -= 6;
     }
     
     this.interval = setInterval(this.gameLoop, this.currentSpeed);
   }
 
-  updateStats() {
-    this.points++;
+  updateStats(value) {
+    this.points += value;
     this.stats.pPoints.innerHTML = `Current score: ${this.points}`;
 
     if (this.points > this.bestScore) {
@@ -281,8 +303,8 @@ class Game {
         valid.push(true);
       }
       
-      for (let i = 0; i < this.apples.length; i++){
-        if (randomX === this.apples[i].x && randomY === this.apples[i].y) {
+      for (let i = 0; i < this.fruits.length; i++){
+        if (randomX === this.fruits[i].x && randomY === this.fruits[i].y) {
           valid.push(false);
           break;
         } else {
@@ -334,7 +356,7 @@ class Game {
     this.obstacles.push(obstacle);
   }
 
-  createApple() {    
+  createFruit() {    
     let x = 0;
     let y = 0;
     
@@ -344,6 +366,15 @@ class Game {
     do {
       const randomX = Math.floor(Math.random() * this.width);
       const randomY = Math.floor(Math.random() * this.height);
+
+      for (let i = 0; i < this.fruits.length; i++) {
+        if (randomX == this.fruits[i].x && randomY == this.fruits[i].y) {
+          valid.push(false);
+          break;
+        } else {
+          valid.push(true);
+        }
+      }
 
       for (let i = 0; i < this.snake.elements.length; i++) {
         if (randomX == this.snake.elements[i].x && randomY == this.snake.elements[i].y) {
@@ -380,22 +411,78 @@ class Game {
     valid.length = 0;
     
     const div = document.createElement('div');
-    div.className = 'apple';  
-
-    div.style.left = this.offsetX + this.gridSize * x + 'px';
-    div.style.top = this.offsetY + this.gridSize * y + 'px';
-    div.style.width = this.gridSize + 'px';
-    div.style.height = this.gridSize + 'px';
-
     document.body.append(div);
 
-    const apple = {
+    const fruit = {
       div: div,
       x: x,
       y: y,
     };
+    
+    return fruit;
+  }
 
-    this.apples.push(apple);
+  createApple() {
+    let apple = this.createFruit();
+
+    apple.div.className = 'apple';
+    apple.div.style.left = this.offsetX + this.gridSize * apple.x + 'px';
+    apple.div.style.top = this.offsetY + this.gridSize * apple.y + 'px';
+    apple.div.style.width = this.gridSize + 'px';
+    apple.div.style.height = this.gridSize + 'px';
+
+    apple.name = 'apple';
+    apple.points = 1;
+
+    this.fruits.push(apple);
+  }
+
+  createStrawberry() {
+    let strawberry = this.createFruit();
+
+    strawberry.div.className = 'strawberry';
+    strawberry.div.style.left = this.offsetX + this.gridSize * strawberry.x + 'px';
+    strawberry.div.style.top = this.offsetY + this.gridSize * strawberry.y + 'px';
+    strawberry.div.style.width = this.gridSize + 'px';
+    strawberry.div.style.height = this.gridSize + 'px';
+
+    strawberry.name = 'strawberry';
+    strawberry.points = 3;
+
+    this.fruits.push(strawberry);
+
+    this.strawberryTimeout = setTimeout(this.removeSpecialFruit, 5000)
+  }
+
+  createBanana() {
+    let banana = this.createFruit();
+
+    banana.div.className = 'banana';
+    banana.div.style.left = this.offsetX + this.gridSize * banana.x + 'px';
+    banana.div.style.top = this.offsetY + this.gridSize * banana.y + 'px';
+    banana.div.style.width = this.gridSize + 'px';
+    banana.div.style.height = this.gridSize + 'px';
+
+    banana.name = 'banana';
+    banana.points = 5;
+
+    this.fruits.push(banana);
+
+    this.bananaTimeout = setTimeout(this.removeSpecialFruit, 3000)
+  }
+
+  removeSpecialFruit = () => {
+    this.createApple();
+    for (let i = 0; i < this.fruits.length; i++) {
+      if (this.fruits[i].name == 'strawberry') {
+        this.fruits[i].div.remove();
+        this.fruits.splice([i], 1);
+      }
+      if (this.fruits[i].name == 'banana') {
+        this.fruits[i].div.remove();
+        this.fruits.splice([i], 1);
+      }
+    }
   }
   
   handleKeyPress = (e) => {
@@ -448,6 +535,8 @@ class Game {
     }
    
     clearInterval(this.interval);
+    clearTimeout(this.bananaTimeout);
+    clearTimeout(this.strawberryTimeout);
     this.enablePlayButton();
   }
 
@@ -482,9 +571,11 @@ class Game {
     for (let i = 0; i < this.snake.elements.length; i++) {
       this.snake.elements[i].div.remove();
     }
-    if (this.apples.length > 0) {
-      this.apples.shift().div.remove();
+
+    for (let i = 0; i < this.fruits.length; i++) {
+      this.fruits[i].div.remove();
     }
+
     for (let i = 0; i < this.obstacles.length; i++) {
       this.obstacles[i].div.remove();
     }
@@ -493,6 +584,8 @@ class Game {
     this.points = 0;
     this.keys = [];
     this.obstacles = [];
+    this.fruits = [];
+    this.removedFruits = 0;
     this.stats.pPoints.innerHTML = `Current score: ${this.points}`;
     document.getElementsByClassName('game-over-message')[0].style = 'none';
     this.currentSpeed = this.startSpeed;
@@ -504,5 +597,5 @@ class Game {
   }
 }
 
-const game = new Game(20, 20, 20, 50, 50, 5, 1, 'medium');
+const game = new Game(20, 20, 35, 50, 50, 3, 1, 'medium');
 game.stats.button.addEventListener('click', game.start);

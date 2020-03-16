@@ -4,6 +4,7 @@ html,body {
   margin: 0;
   padding: 0;
   background: #111C31;
+  touch-action: manipulation;
 }
 
 .field {
@@ -26,7 +27,7 @@ html,body {
 .apple {
   position: absolute;
   z-index: 1;
-  background-image: url("./images/apple.png");
+  background-image: url("./assets/images/apple.png");
   background-repeat: no-repeat;
   background-size: cover;
 }
@@ -34,14 +35,14 @@ html,body {
 .strawberry {
   position: absolute;
   z-index: 1;
-  background-image: url("./images/strawberry.png");
+  background-image: url("./assets/images/strawberry.png");
   background-repeat: no-repeat;
   background-size: cover;
 }
 .banana {
   position: absolute;
   z-index: 1;
-  background-image: url("./images/banana.png");
+  background-image: url("./assets/images/banana.png");
   background-repeat: no-repeat;
   background-size: cover;
 }
@@ -49,7 +50,7 @@ html,body {
 .obstacle {
   position: absolute;
   z-index: 1;
-  background-image: url("./images/rock.png");
+  background-image: url("./assets/images/rock.png");
   background-repeat: no-repeat;
   background-size: cover;
 }
@@ -107,6 +108,46 @@ html,body {
 .button:disabled {
   cursor: default;
   color: #f00;
+}
+
+.arrow-buttons {
+  width: 100%;
+  padding: 5px;
+  display: grid;
+  grid-template-columns: auto 55px auto;
+  grid-template-rows: auto auto auto;
+}
+
+.arrow-buttons i {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 5px;
+  height: 45px;
+  width: 45px;
+  font-size: 40px;
+  border-radius: 20%;
+  color: #ddd;
+  background: #800;
+}
+
+.arrow-buttons .up-button {
+  grid-column: 2;
+}
+
+.arrow-buttons .down-button {
+  grid-column: 2;
+  grid-row: 3;
+}
+
+.arrow-buttons .left-button {
+  grid-column: 1;
+  display: flex;
+  justify-self: right;
+}
+
+.arrow-buttons .right-button {
+  grid-column: 3;
 }
 
 .game-over-message {

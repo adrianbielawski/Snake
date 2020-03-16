@@ -142,6 +142,45 @@ const stats = (width, height, gridSize, offsetX, offsetY, border) => {
   return stats;
 }
 
+const arrowButtons = (width, height, gridSize, offsetX, offsetY, border) => {
+  const arrowButtonsDiv = document.createElement('div');
+  arrowButtonsDiv.className = 'arrow-buttons';
+
+  const upButton = document.createElement('div');
+  upButton.className = 'up-button';
+  upButton.innerHTML = `<i class="fas fa-arrow-up"></i>`;
+
+  const downButton = document.createElement('div');
+  downButton.className = 'down-button';
+  downButton.innerHTML = `<i class="fas fa-arrow-down"></i>`;
+
+  const leftButton = document.createElement('div');
+  leftButton.className = 'left-button';
+  leftButton.innerHTML = `<i class="fas fa-arrow-left"></i>`;
+
+  const rightButton = document.createElement('div');
+  rightButton.className = 'right-button';
+  rightButton.innerHTML = `<i class="fas fa-arrow-right"></i>`;
+
+  arrowButtonsDiv.appendChild(upButton);
+  arrowButtonsDiv.appendChild(downButton);
+  arrowButtonsDiv.appendChild(leftButton);
+  arrowButtonsDiv.appendChild(rightButton);
+
+  const stats = document.getElementsByClassName('stats')[0];
+
+  stats.appendChild(arrowButtonsDiv);
+
+  const arrowButtons = {
+    arrowButtonsDiv: arrowButtonsDiv,
+    upButton: upButton,
+    downButton: downButton,
+    leftButton: leftButton,
+    rightButton: rightButton,
+  }
+  return arrowButtons;
+}
+
 class Game {
   constructor(width, height, gridSize, offsetX, offsetY, border, level) {
     this.width = width;
@@ -166,6 +205,7 @@ class Game {
     this.field = new Field(this.width, this.height, this.gridSize, this.offsetX, this.offsetY, this.border);
     this.snake = new Snake(this.field, this.length, this.gridSize, this.offsetX, this.offsetY);
     this.stats = stats(width, height, gridSize, offsetX, offsetY, border);
+    this.arrowButtons = arrowButtons(width, height, gridSize, offsetX, offsetY, border);
   }
 
   startSpeed() {
@@ -498,7 +538,6 @@ class Game {
   }
   
   handleKeyPress = (e) => {
-
     if (this.keys.length >= 2) {
       return
     }
@@ -534,6 +573,42 @@ class Game {
       slideDirection = 'ArrowUp';
     }
     this.keys.push(slideDirection);
+  }
+
+  upButton = () => {
+    this.handleArrowButtons('up')
+  }
+  
+  downButton = () => {
+    this.handleArrowButtons('down')
+  }
+  
+  leftButton = () => {
+    this.handleArrowButtons('left')
+  }
+  
+  rightButton = () => {
+    this.handleArrowButtons('right')
+  }
+
+  handleArrowButtons = (b) => {
+    if (this.keys.length >= 2) {
+      return
+    }
+
+    let buttonDirection;
+    if (b == 'up') {
+      buttonDirection = 'ArrowUp';
+    } else if (b == 'down') {
+      buttonDirection = 'ArrowDown';
+    } else if (b == 'left') {
+      buttonDirection = 'ArrowLeft';
+    } else if (b == 'right') {
+      buttonDirection = 'ArrowRight';
+    }
+    
+    this.keys.push(buttonDirection);
+
   }
 
   checkKeys() {
@@ -660,6 +735,10 @@ class Game {
     this.createObstacle();
     document.getElementsByClassName('game-over-message')[0].style = 'none';
     document.addEventListener('keydown', this.handleKeyPress);
+    this.arrowButtons.upButton.addEventListener('click', this.upButton);
+    this.arrowButtons.downButton.addEventListener('click', this.downButton);
+    this.arrowButtons.leftButton.addEventListener('click', this.leftButton);
+    this.arrowButtons.rightButton.addEventListener('click', this.rightButton);
     this.touchScreenSteering();
   }
 }

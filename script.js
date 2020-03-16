@@ -143,15 +143,13 @@ const stats = (width, height, gridSize, offsetX, offsetY, border) => {
 }
 
 class Game {
-  constructor(width, height, gridSize, offsetX, offsetY, snakeLength, border, level) {
+  constructor(width, height, gridSize, offsetX, offsetY, border, level) {
     this.width = width;
     this.height = height;
     this.gridSize = gridSize;
     this.offsetX = offsetX;
     this.offsetY = offsetY;
     this.border = border;
-    this.startLength = snakeLength;
-    this.length = snakeLength;
     this.keys = [];
     this.fruits = [];
     this.obstacles = [];
@@ -160,6 +158,8 @@ class Game {
     this.oldBestScore = 0;
     this.removedFruits = 0;
     this.level = level.toLowerCase();
+    this.startLength = this.startLength();
+    this.length = this.startLength;
     this.startSpeed = this.startSpeed();
     this.currentSpeed = this.startSpeed;
     this.field = new Field(this.width, this.height, this.gridSize, this.offsetX, this.offsetY, this.border);
@@ -177,8 +177,21 @@ class Game {
         return 175;
     }
   }
+  
+  startLength() {
+    switch (this.level) {
+      case 'easy':
+        return 3;
+      case 'medium':
+        return 5;
+      case 'hard':
+        return 10;
+    }
+  }
 
   isValidMove(x, y) {
+    console.log(this.currentSpeed);
+    console.log(this.startLength);
     if (x >= this.field.width || y >= this.field.height || x < 0 || y < 0) {
       return false
     }
@@ -597,5 +610,5 @@ class Game {
   }
 }
 
-const game = new Game(20, 20, 35, 50, 50, 3, 1, 'medium');
+const game = new Game(20, 20, 35, 50, 50, 1, 'hard');
 game.stats.button.addEventListener('click', game.start);

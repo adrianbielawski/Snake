@@ -151,6 +151,7 @@ class Game {
     this.offsetY = offsetY;
     this.border = border;
     this.keys = [];
+    this.slides = [];
     this.fruits = [];
     this.obstacles = [];
     this.points = 0;
@@ -190,8 +191,6 @@ class Game {
   }
 
   isValidMove(x, y) {
-    console.log(this.currentSpeed);
-    console.log(this.startLength);
     if (x >= this.field.width || y >= this.field.height || x < 0 || y < 0) {
       return false
     }
@@ -499,6 +498,7 @@ class Game {
   }
   
   handleKeyPress = (e) => {
+
     if (this.keys.length >= 2) {
       return
     }
@@ -511,6 +511,29 @@ class Game {
     }
     
     this.keys.push(e.key);
+  }
+
+  handleSlides() {
+    if (this.keys.length >= 2) {
+      return
+    }
+
+    let slideDirection;
+    let x = this.slideDistance.x;
+    let y = this.slideDistance.y;
+    let absX = Math.abs(x);
+    let absY = Math.abs(y);
+
+    if (x <= -20 && absY <= 50 ) {
+      slideDirection = 'ArrowRight';
+    } else if (x >= 20 && absY <= 50 ) {
+      slideDirection = 'ArrowLeft';
+    } else if (y <= -20 && absX <= 50 ) {
+      slideDirection = 'ArrowDown';
+    } else if (y >= 20 && absX <= 50 ) {
+      slideDirection = 'ArrowUp';
+    }
+    this.keys.push(slideDirection);
   }
 
   checkKeys() {
@@ -550,6 +573,9 @@ class Game {
     clearInterval(this.interval);
     clearTimeout(this.bananaTimeout);
     clearTimeout(this.strawberryTimeout);
+    this.listenField.removeEventListener('touchstart', this.touchStart);
+    this.listenField.removeEventListener('touchend', this.touchEnd);
+    this.listenField.removeEventListener('touchmove', this.preventDefaultSlide);
     this.enablePlayButton();
   }
 
@@ -580,6 +606,33 @@ class Game {
     button.innerHTML = 'Good luck!';
   }
 
+  touchScreenSteering() {
+    this.startX;
+    this.startY;
+    this.listenField = document.getElementsByClassName('field')[0];
+    this.listenField.addEventListener('touchstart', this.touchStart);
+    this.listenField.addEventListener('touchmove', this.preventDefaultSlide)
+    this.listenField.addEventListener('touchend', this.touchEnd);
+  }
+
+  touchStart = (e) => {
+    let touch = e.changedTouches[0];
+    this.startX = touch.pageX;
+    this.startY = touch.pageY;
+  }
+
+  preventDefaultSlide = (e) => {
+    e.preventDefault()
+  }
+
+  touchEnd = (e) => {
+    let touch = e.changedTouches[0];
+    this.slideDistance = {};
+    this.slideDistance.x = this.startX - touch.pageX;
+    this.slideDistance.y = this.startY - touch.pageY;
+    this.handleSlides();
+  }
+
   start = () => {
     for (let i = 0; i < this.snake.elements.length; i++) {
       this.snake.elements[i].div.remove();
@@ -600,15 +653,16 @@ class Game {
     this.fruits = [];
     this.removedFruits = 0;
     this.stats.pPoints.innerHTML = `Current score: ${this.points}`;
-    document.getElementsByClassName('game-over-message')[0].style = 'none';
     this.currentSpeed = this.startSpeed;
     this.interval = setInterval(this.gameLoop, this.startSpeed);
     this.disablePlayButton();
-    document.addEventListener('keydown', this.handleKeyPress);
     this.createApple();
     this.createObstacle();
+    document.getElementsByClassName('game-over-message')[0].style = 'none';
+    document.addEventListener('keydown', this.handleKeyPress);
+    this.touchScreenSteering();
   }
 }
 
-const game = new Game(20, 20, 35, 50, 50, 1, 'hard');
+const game = new Game(20, 20, 20, 5, 5, 1, 'medium');
 game.stats.button.addEventListener('click', game.start);

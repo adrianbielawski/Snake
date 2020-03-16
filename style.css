@@ -26,7 +26,7 @@ html,body {
 .apple {
   position: absolute;
   z-index: 1;
-  background-image: url(/apple.png);
+  background-image: url("./images/apple.png");
   background-repeat: no-repeat;
   background-size: cover;
 }
@@ -34,14 +34,14 @@ html,body {
 .strawberry {
   position: absolute;
   z-index: 1;
-  background-image: url(/strawberry.png);
+  background-image: url("./images/strawberry.png");
   background-repeat: no-repeat;
   background-size: cover;
 }
 .banana {
   position: absolute;
   z-index: 1;
-  background-image: url(/banana.png);
+  background-image: url("./images/banana.png");
   background-repeat: no-repeat;
   background-size: cover;
 }
@@ -49,7 +49,7 @@ html,body {
 .obstacle {
   position: absolute;
   z-index: 1;
-  background-image: url(/rock.png);
+  background-image: url("./images/rock.png");
   background-repeat: no-repeat;
   background-size: cover;
 }

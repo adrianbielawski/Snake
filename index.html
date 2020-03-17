@@ -8,6 +8,26 @@
     <link href="./assets/fonts/css/all.css" rel="stylesheet">
   </head>
   <body>
+    <form id="settings">
+      <label for="user-name">Your name</label>
+      <input type="text" id="user-name" name="user-name" minlength="5" placeholder="Min. 5 characters" required oninvalid="this.setCustomValidity('This field require min 5 characters')" onchange="this.setCustomValidity('')">
+      <label for="level">Choose level</label>
+      <select id="level" name="level">
+        <option value="easy">Easy</option>
+        <option value="medium">Medium</option>
+        <option value="hard">Hard</option>
+      </select>
+      <label for="field-size">Choose field size</label>
+      <select id="field-size" name="field-size">
+        <option value="15">15</option>
+        <option value="20">20</option>
+        <option value="25">25</option>
+        <option value="30">30</option>
+      </select>
+      <input type="submit" id="submit">
+    </form>
+
     <script src="script.js"></script>
+
   </body>
 </html>

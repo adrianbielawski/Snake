@@ -62,37 +62,32 @@ html,body {
   align-items: center;
   justify-content: space-around;
   background: #f00;
-  min-height: 60px;
 }
 
 .points {
-  margin: 0 3px;
+  margin: 0 2px;
   color: #fff;
   font-size: 24px;
   min-width: 180px;
-  line-height: 2em;
-  display: flex;
-  justify-content: space-around;
+  line-height: 36px;
 }
 
 .best-score {
-  margin: 0 3px;
+  margin: 0 2px;
   color: #fff;
   font-size: 24px;
   min-width: 150px;
-  line-height: 2em;
-  display: flex;
-  justify-content: space-around;
+  line-height: 36px;
 }
 
 .button {
   right: 0;
-  min-width: 100px;
+  min-width: 120px;
   max-width: 165px;
   width: 25%;
-  height: 55px;
+  height: 70px;
   padding: 0;
-  margin: 5px;
+  margin: 2px;
   outline: none;
   background-color: #d8d8d8;
   color: #000;
@@ -103,16 +98,30 @@ html,body {
   justify-content: center;
   text-align: center;
   cursor: pointer;
+  border-top: 2px solid lightgrey;
+  border-left: 2px solid lightgrey;
+  border-right: 2px solid grey;
+  border-bottom: 2px solid grey;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.button:active {
+  border-top: 2px solid grey;
+  border-left: 2px solid grey;
+  border-right: 2px solid lightgrey;
+  border-bottom: 2px solid lightgrey;
 }
 
 .button:disabled {
   cursor: default;
   color: #f00;
+  font-size: 20px;
+  font-weight: 700;
 }
 
 .arrow-buttons {
   width: 100%;
-  padding: 5px;
+  padding: 0px;
   display: grid;
   grid-template-columns: auto 55px auto;
   grid-template-rows: auto auto auto;
@@ -122,13 +131,26 @@ html,body {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 5px;
+  margin: 3px;
   height: 45px;
   width: 45px;
   font-size: 40px;
   border-radius: 20%;
   color: #ddd;
   background: #800;
+  cursor: pointer;
+  border-top: 2px solid lightgrey;
+  border-left: 2px solid lightgrey;
+  border-right: 2px solid grey;
+  border-bottom: 2px solid grey;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.arrow-buttons i:active {
+  border-top: 2px solid grey;
+  border-left: 2px solid grey;
+  border-right: 2px solid lightgrey;
+  border-bottom: 2px solid lightgrey;
 }
 
 .arrow-buttons .up-button {
@@ -157,7 +179,59 @@ html,body {
   font-size: 48px;
   font-weight: 700;
   margin: 0;
+  padding: 5px;
   color: #00d;
   background: rgba(102, 102, 102, 0.7);
-  border:1px solid #000;
+  border: 1px solid #000;
+}
+
+#settings {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2em;
+}
+
+#user-name, #level, #field-size {
+  width: 100%;
+  height: 30px;
+  max-width: 200px;
+  margin: 0 5px 20px 5px;
+  font-size: 1.2em;
+  outline: none;
+  border: none;
+  box-sizing: border-box;
+}
+
+#user-name:invalid {
+  border: 1px solid red;
+}
+
+#submit {
+  width: 100px;
+  height: 30px;
+  margin: 0 5px 20px 5px;
+  font-size: 1.2em;
+  outline: none;
+  border: none;
+  border-top: 2px solid lightgrey;
+  border-left: 2px solid lightgrey;
+  border-right: 2px solid grey;
+  border-bottom: 2px solid grey;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#submit:active {
+  border-top: 2px solid grey;
+  border-left: 2px solid grey;
+  border-right: 2px solid lightgrey;
+  border-bottom: 2px solid lightgrey;
+}
+
+
+#settings label {
+  color: #fff;
+  margin: 0 0 0 5px;
 }

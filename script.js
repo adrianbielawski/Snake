@@ -88,15 +88,19 @@ class Snake {
   }
 }
 
-const stats = (width, height, gridSize, offsetX, offsetY, border) => {
+const stats = (width, gridSize, offsetX, offsetY, border, statsHeight) => {
   const statsDiv = document.createElement('div');
   const statsWidth = width * gridSize;
-  const statsTop = height * gridSize + offsetY;
+  const statsTop = width * gridSize + offsetY;
   statsDiv.className = 'stats';
   statsDiv.style.width = `${statsWidth}px`;
   statsDiv.style.top = `${statsTop}px`;
   statsDiv.style.left = offsetX - border + 'px';
   statsDiv.style.border = `${border}px solid #000`;
+  statsDiv.style.height = `${statsHeight}px`;
+
+  const scores = document.createElement('div');
+  scores.className = 'scores';
 
   const pPoints = document.createElement('p');
   pPoints.className = 'points';
@@ -126,8 +130,9 @@ const stats = (width, height, gridSize, offsetX, offsetY, border) => {
   }
   
   field.appendChild(gameOverMessage);
-  statsDiv.appendChild(pPoints);
-  statsDiv.appendChild(pBestScore);
+  scores.appendChild(pPoints);
+  scores.appendChild(pBestScore);
+  statsDiv.appendChild(scores);
   statsDiv.appendChild(button);
 
   document.body.append(statsDiv);
@@ -142,7 +147,7 @@ const stats = (width, height, gridSize, offsetX, offsetY, border) => {
   return stats;
 }
 
-const arrowButtons = (width, height, gridSize, offsetX, offsetY, border) => {
+const arrowButtons = () => {
   const arrowButtonsDiv = document.createElement('div');
   arrowButtonsDiv.className = 'arrow-buttons';
 
@@ -182,10 +187,12 @@ const arrowButtons = (width, height, gridSize, offsetX, offsetY, border) => {
 }
 
 class Game {
-  constructor(width, height, gridSize, offsetX, offsetY, border, level) {
-    this.width = width;
-    this.height = height;
+  constructor(fieldSize, statsHeight, gridSize, offsetX, offsetY, border, level, userName) {
+    this.width = fieldSize;
+    this.height = fieldSize;
     this.gridSize = gridSize;
+    this.statsHeight = statsHeight;
+    this.userName = userName;
     this.offsetX = offsetX;
     this.offsetY = offsetY;
     this.border = border;
@@ -204,18 +211,18 @@ class Game {
     this.currentSpeed = this.startSpeed;
     this.field = new Field(this.width, this.height, this.gridSize, this.offsetX, this.offsetY, this.border);
     this.snake = new Snake(this.field, this.length, this.gridSize, this.offsetX, this.offsetY);
-    this.stats = stats(width, height, gridSize, offsetX, offsetY, border);
-    this.arrowButtons = arrowButtons(width, height, gridSize, offsetX, offsetY, border);
+    this.stats = stats(fieldSize, gridSize, offsetX, offsetY, border, statsHeight);
+    this.arrowButtons = arrowButtons();
   }
 
   startSpeed() {
     switch (this.level) {
       case 'easy':
-        return 225;
+        return 300;
       case 'medium':
-        return 200;
+        return 225;
       case 'hard':
-        return 175;
+        return 200;
     }
   }
   
@@ -334,8 +341,6 @@ class Game {
     do {
       const randomX = Math.floor(Math.random() * this.width);
       const randomY = Math.floor(Math.random() * this.height);
-
-      let snakeHead = this.snake.elements[0]
 
       let xDifference = randomX - this.snake.elements[0].x;
       let yDifference = randomY - this.snake.elements[0].y;
@@ -678,7 +683,7 @@ class Game {
     const button = this.stats.button;
     button.removeEventListener('click', this.start);
     button.disabled = true;
-    button.innerHTML = 'Good luck!';
+    button.innerHTML = `Good luck, ${this.userName}!`;
   }
 
   touchScreenSteering() {
@@ -743,5 +748,38 @@ class Game {
   }
 }
 
-const game = new Game(20, 20, 20, 5, 5, 1, 'medium');
-game.stats.button.addEventListener('click', game.start);
+const settings = () => {
+  const screenWidth = window.innerWidth;
+  const screenHeight = window.innerHeight;
+  const settings = document.getElementById('settings');
+  const userName = document.getElementById('user-name').value;
+  const level = document.getElementById('level').value;
+  const fieldSize = document.getElementById('field-size').value;
+  const border = 1
+  let snakeSize = 30;
+  let margin = 10;
+  if (screenWidth <= 800) {
+    snakeSize = (screenWidth - margin) / fieldSize;
+  }
+  const offsetX = (screenWidth - fieldSize * snakeSize) / 2;
+  const offsetY = 2;
+  let statsHeight = 250;
+  if (screenWidth <= 800) {
+    statsHeight = screenHeight - (fieldSize * snakeSize) - (offsetY * 2);
+  }
+  const game = new Game(fieldSize, statsHeight, snakeSize, offsetX, offsetY, border, level, userName);
+  game.stats.button.addEventListener('click', game.start);
+  settings.remove();
+}
+
+const userNameValidation = () => {  
+  const userName = document.getElementById('user-name').value;
+  
+  if (userName.length < 5) {
+    return
+  }
+  settings();
+}
+
+const submit = document.getElementById('submit');
+const listenSubmit = submit.addEventListener('click', userNameValidation)

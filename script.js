@@ -1,23 +1,21 @@
 class Field {
-  constructor(width, height, gridSize, offsetX, offsetY, border) {
-    this.width = width;
-    this.height = height;
-    this.gridSize = gridSize;
+  constructor(fieldSize, snakeSize, offsetX, offsetY, border) {
+    this.fieldSize = fieldSize;
+    this.snakeSize = snakeSize;
     this.offsetX = offsetX;
     this.offsetY = offsetY;
     this.border = border;
-
-    const div = this.render('field', width, height, border);
+    this.div = this.render();
   }
 
-  render(className, w, h) {
+  render() {
     const div = document.createElement('div');
-    div.className = className;
+    div.className = 'field';
 
     div.style.left = this.offsetX - this.border + 'px';
     div.style.top = this.offsetY - this.border + 'px';
-    div.style.width = this.gridSize * w +'px';
-    div.style.height = this.gridSize * h + 'px';
+    div.style.width = this.snakeSize * this.fieldSize +'px';
+    div.style.height = this.snakeSize * this.fieldSize + 'px';
     div.style.border = `${this.border}px solid #000`;
 
     document.body.append(div);
@@ -38,29 +36,28 @@ class Snake {
     [Snake.DOWN]: {x: 0, y: 1},
   };
 
-  constructor(field, length, gridSize, offsetX, offsetY) {
+  constructor(field, length, snakeSize, offsetX, offsetY) {
     this.field = field;
     this.length = length;
-    this.gridSize = gridSize;
+    this.snakeSize = snakeSize;
     this.offsetX = offsetX;
     this.offsetY = offsetY;
     this.direction = Snake.RIGHT;
     this.elements = [];
     this.createElement(
-      Math.floor(field.width / 2),
-      Math.floor(field.height / 2),
-      gridSize, offsetX, offsetY
+      Math.floor(field.fieldSize / 2),
+      Math.floor(field.fieldSize / 2),
+      snakeSize, offsetX, offsetY
     );
   }
-  createElement = (x, y, gridSize, offsetX, offsetY) => {
+  createElement = (x, y, snakeSize, offsetX, offsetY) => {
     const div = document.createElement('div');
-    div.className = 'snake-element';
-  
+    div.className = 'snake-element';  
 
-    div.style.left = offsetX + gridSize * x + 'px';
-    div.style.top = offsetY + gridSize * y + 'px';
-    div.style.width = gridSize + 'px';
-    div.style.height = gridSize + 'px';
+    div.style.left = offsetX + snakeSize * x + 'px';
+    div.style.top = offsetY + snakeSize * y + 'px';
+    div.style.width = snakeSize + 'px';
+    div.style.height = snakeSize + 'px';
 
     document.body.append(div);
 
@@ -78,8 +75,8 @@ class Snake {
     return [x, y];
   }
 
-  move = (x, y, gridSize, offsetX, offsetY) => {
-    this.createElement(x, y, gridSize, offsetX, offsetY);
+  move = (x, y, snakeSize, offsetX, offsetY) => {
+    this.createElement(x, y, snakeSize, offsetX, offsetY);
 
     if (this.elements.length > this.length) {
       const last = this.elements.pop();
@@ -88,114 +85,98 @@ class Snake {
   }
 }
 
-const stats = (width, gridSize, offsetX, offsetY, border, statsHeight) => {
-  const statsDiv = document.createElement('div');
-  const statsWidth = width * gridSize;
-  const statsTop = width * gridSize + offsetY;
-  statsDiv.className = 'stats';
-  statsDiv.style.width = `${statsWidth}px`;
-  statsDiv.style.top = `${statsTop}px`;
-  statsDiv.style.left = offsetX - border + 'px';
-  statsDiv.style.border = `${border}px solid #000`;
-  statsDiv.style.height = `${statsHeight}px`;
-
-  const scores = document.createElement('div');
-  scores.className = 'scores';
-
-  const pPoints = document.createElement('p');
-  pPoints.className = 'points';
-  pPoints.innerHTML = `Current score: 0`;
-
-  const pBestScore = document.createElement('p');
-  pBestScore.className = 'best-score';
-  pBestScore.innerHTML = 'Best score: 0';
-
-  const button = document.createElement('button');
-  button.className = 'button';
-  button.innerHTML = 'Start new game';
-  
-  const gameOverMessage = document.createElement('p');
-  const field = document.body.getElementsByClassName('field')[0];
-  gameOverMessage.className = 'game-over-message';
-  gameOverMessage.style.display = 'none';
-  
-  const fieldWidth = width * gridSize;
-
-  if (fieldWidth <= 150) {
-    pPoints.style.fontSize = '14px';
-    pBestScore.style.fontSize = '14px';
-    button.style.fontSize = '14px';
-    button.style.minWidth = '90%';
-    button.style.maxHeight = '45px';
-  }
-  
-  field.appendChild(gameOverMessage);
-  scores.appendChild(pPoints);
-  scores.appendChild(pBestScore);
-  statsDiv.appendChild(scores);
-  statsDiv.appendChild(button);
-
-  document.body.append(statsDiv);
-
-  const stats = {
-    stats: statsDiv,
-    pPoints: pPoints,
-    pBestScore: pBestScore,
-    button: button,
-    gameOverMessage: gameOverMessage
-  }
-  return stats;
-}
-
-const arrowButtons = () => {
-  const arrowButtonsDiv = document.createElement('div');
-  arrowButtonsDiv.className = 'arrow-buttons';
-
-  const upButton = document.createElement('div');
-  upButton.className = 'up-button';
-  upButton.innerHTML = `<i class="fas fa-arrow-up"></i>`;
-
-  const downButton = document.createElement('div');
-  downButton.className = 'down-button';
-  downButton.innerHTML = `<i class="fas fa-arrow-down"></i>`;
-
-  const leftButton = document.createElement('div');
-  leftButton.className = 'left-button';
-  leftButton.innerHTML = `<i class="fas fa-arrow-left"></i>`;
-
-  const rightButton = document.createElement('div');
-  rightButton.className = 'right-button';
-  rightButton.innerHTML = `<i class="fas fa-arrow-right"></i>`;
-
-  arrowButtonsDiv.appendChild(upButton);
-  arrowButtonsDiv.appendChild(downButton);
-  arrowButtonsDiv.appendChild(leftButton);
-  arrowButtonsDiv.appendChild(rightButton);
-
-  const stats = document.getElementsByClassName('stats')[0];
-
-  stats.appendChild(arrowButtonsDiv);
-
-  const arrowButtons = {
-    arrowButtonsDiv: arrowButtonsDiv,
-    upButton: upButton,
-    downButton: downButton,
-    leftButton: leftButton,
-    rightButton: rightButton,
-  }
-  return arrowButtons;
-}
-
-class Game {
-  constructor(fieldSize, statsHeight, gridSize, offsetX, offsetY, border, level, userName) {
-    this.width = fieldSize;
-    this.height = fieldSize;
-    this.gridSize = gridSize;
-    this.statsHeight = statsHeight;
-    this.userName = userName;
+class Stats {
+  constructor(fieldSize, snakeSize, offsetX, offsetY, border, statsHeight) {
+    this.fieldSize = fieldSize;
+    this.snakeSize = snakeSize;
     this.offsetX = offsetX;
     this.offsetY = offsetY;
     this.border = border;
+    this.statsHeight = statsHeight;
+    this.stats = this.createStats();
+  }
+
+  createStats() {
+    const statsWidth = this.fieldSize * this.snakeSize;
+    const statsTop = this.fieldSize * this.snakeSize + this.offsetY;
+
+    this.statsDiv = document.createElement('div');
+    this.statsDiv.className = 'stats';
+    this.statsDiv.style.width = `${statsWidth}px`;
+    this.statsDiv.style.top = `${statsTop}px`;
+    this.statsDiv.style.left = this.offsetX - this.border + 'px';
+    this.statsDiv.style.border = `${this.border}px solid #000`;
+    this.statsDiv.style.height = `${this.statsHeight}px`;
+
+    this.scores = document.createElement('div');
+    this.scores.className = 'scores';
+  
+    this.pPoints = document.createElement('p');
+    this.pPoints.className = 'points';
+    this.pPoints.innerHTML = `Current score: 0`;
+  
+    this.pBestScore = document.createElement('p');
+    this.pBestScore.className = 'best-score';
+    this.pBestScore.innerHTML = 'Best score: 0';
+
+    this.button = document.createElement('button');
+    this.button.className = 'button';
+    this.button.innerHTML = 'Start new game';
+    
+    this.gameOverMessage = document.createElement('p');
+    this.gameOverMessage.className = 'game-over-message';
+    this.gameOverMessage.style.display = 'none';
+    
+    this.arrowButtonsDiv = document.createElement('div');
+    this.arrowButtonsDiv.className = 'arrow-buttons';
+
+    this.upButton = document.createElement('div');
+    this.upButton.className = 'up-button';
+    this.upButton.innerHTML = `<i class="fas fa-arrow-up"></i>`;
+
+    this.downButton = document.createElement('div');
+    this.downButton.className = 'down-button';
+    this.downButton.innerHTML = `<i class="fas fa-arrow-down"></i>`;
+
+    this.leftButton = document.createElement('div');
+    this.leftButton.className = 'left-button';
+    this.leftButton.innerHTML = `<i class="fas fa-arrow-left"></i>`;
+
+    this.rightButton = document.createElement('div');
+    this.rightButton.className = 'right-button';
+    this.rightButton.innerHTML = `<i class="fas fa-arrow-right"></i>`;
+    
+    this.field = document.body.getElementsByClassName('field')[0];
+    
+    this.field.appendChild(this.gameOverMessage);
+    this.scores.appendChild(this.pPoints);
+    this.scores.appendChild(this.pBestScore);
+    this.arrowButtonsDiv.appendChild(this.upButton);
+    this.arrowButtonsDiv.appendChild(this.downButton);
+    this.arrowButtonsDiv.appendChild(this.leftButton);
+    this.arrowButtonsDiv.appendChild(this.rightButton);
+    this.statsDiv.appendChild(this.scores);
+    this.statsDiv.appendChild(this.button);
+    this.statsDiv.appendChild(this.arrowButtonsDiv);
+    document.body.append(this.statsDiv);
+  }
+}
+
+class Game {
+  constructor(userName) {
+    this.level = document.getElementById('level').value;
+    this.fieldSize = document.getElementById('field-size').value;
+    this.userName = userName;
+    this.margin = 10;
+    this.border = 1
+    this.screenWidth = window.innerWidth;
+    this.screenHeight = window.innerHeight;
+    this.snakeSize = this.getSnakeSize();
+    this.offsetX = (this.screenWidth - this.fieldSize * this.snakeSize) / 2;
+    this.offsetY = 2;
+    this.statsHeight = this.getStatsHeight();
+    this.settings = document.getElementById('settings');
+    this.removeSettings = settings.remove();
     this.keys = [];
     this.slides = [];
     this.fruits = [];
@@ -204,15 +185,36 @@ class Game {
     this.bestScore = 0;
     this.oldBestScore = 0;
     this.removedFruits = 0;
-    this.level = level.toLowerCase();
     this.startLength = this.startLength();
     this.length = this.startLength;
     this.startSpeed = this.startSpeed();
     this.currentSpeed = this.startSpeed;
-    this.field = new Field(this.width, this.height, this.gridSize, this.offsetX, this.offsetY, this.border);
-    this.snake = new Snake(this.field, this.length, this.gridSize, this.offsetX, this.offsetY);
-    this.stats = stats(fieldSize, gridSize, offsetX, offsetY, border, statsHeight);
-    this.arrowButtons = arrowButtons();
+    this.field = new Field(this.fieldSize, this.snakeSize, this.offsetX, this.offsetY, this.border);
+    this.snake = new Snake(this.field, this.length, this.snakeSize, this.offsetX, this.offsetY);
+    this.stats = new Stats(this.fieldSize, this.snakeSize, this.offsetX, this.offsetY, this.border, this.statsHeight);
+    this.listenResize = window.addEventListener('resize', this.calculateStatsHeight);
+  }
+
+  calculateStatsHeight = () => {
+    this.screenHeight = window.innerHeight;
+    this.newHeight = this.getStatsHeight();
+    this.stats.statsDiv.style.height = `${this.newHeight}px`;
+  }
+
+  getSnakeSize() {
+    if (this.screenWidth < 800) {
+      return (this.screenWidth - this.margin) / this.fieldSize;
+    } else {
+      return 25;
+    }
+  }  
+
+  getStatsHeight() {
+    if (this.screenWidth < 800) {
+      return this.screenHeight - (this.fieldSize * this.snakeSize) - (this.offsetY * 2);
+    } else {
+      return 250;
+    }
   }
 
   startSpeed() {
@@ -238,7 +240,7 @@ class Game {
   }
 
   isValidMove(x, y) {
-    if (x >= this.field.width || y >= this.field.height || x < 0 || y < 0) {
+    if (x >= this.field.fieldSize || y >= this.field.fieldSize || x < 0 || y < 0) {
       return false
     }
 
@@ -263,7 +265,7 @@ class Game {
     const y = nextPosition[1];
 
     if (this.isValidMove(x, y)) {
-      this.snake.move(x, y, this.gridSize, this.offsetX, this.offsetY);
+      this.snake.move(x, y, this.snakeSize, this.offsetX, this.offsetY);
     } else {
       this.gameOver();
       return
@@ -339,8 +341,8 @@ class Game {
     let isValid = true;
 
     do {
-      const randomX = Math.floor(Math.random() * this.width);
-      const randomY = Math.floor(Math.random() * this.height);
+      const randomX = Math.floor(Math.random() * this.fieldSize);
+      const randomY = Math.floor(Math.random() * this.fieldSize);
 
       let xDifference = randomX - this.snake.elements[0].x;
       let yDifference = randomY - this.snake.elements[0].y;
@@ -397,10 +399,10 @@ class Game {
     const div = document.createElement('div');
     div.className = 'obstacle';  
 
-    div.style.left = this.offsetX + this.gridSize * x + 'px';
-    div.style.top = this.offsetY + this.gridSize * y + 'px';
-    div.style.width = this.gridSize + 'px';
-    div.style.height = this.gridSize + 'px';
+    div.style.left = this.offsetX + this.snakeSize * x + 'px';
+    div.style.top = this.offsetY + this.snakeSize * y + 'px';
+    div.style.width = this.snakeSize + 'px';
+    div.style.height = this.snakeSize + 'px';
 
     document.body.append(div);
 
@@ -421,8 +423,8 @@ class Game {
     let isValid = true;
 
     do {
-      const randomX = Math.floor(Math.random() * this.width);
-      const randomY = Math.floor(Math.random() * this.height);
+      const randomX = Math.floor(Math.random() * this.fieldSize);
+      const randomY = Math.floor(Math.random() * this.fieldSize);
 
       for (let i = 0; i < this.fruits.length; i++) {
         if (randomX == this.fruits[i].x && randomY == this.fruits[i].y) {
@@ -483,10 +485,10 @@ class Game {
     let apple = this.createFruit();
 
     apple.div.className = 'apple';
-    apple.div.style.left = this.offsetX + this.gridSize * apple.x + 'px';
-    apple.div.style.top = this.offsetY + this.gridSize * apple.y + 'px';
-    apple.div.style.width = this.gridSize + 'px';
-    apple.div.style.height = this.gridSize + 'px';
+    apple.div.style.left = this.offsetX + this.snakeSize * apple.x + 'px';
+    apple.div.style.top = this.offsetY + this.snakeSize * apple.y + 'px';
+    apple.div.style.width = this.snakeSize + 'px';
+    apple.div.style.height = this.snakeSize + 'px';
 
     apple.name = 'apple';
     apple.points = 1;
@@ -498,10 +500,10 @@ class Game {
     let strawberry = this.createFruit();
 
     strawberry.div.className = 'strawberry';
-    strawberry.div.style.left = this.offsetX + this.gridSize * strawberry.x + 'px';
-    strawberry.div.style.top = this.offsetY + this.gridSize * strawberry.y + 'px';
-    strawberry.div.style.width = this.gridSize + 'px';
-    strawberry.div.style.height = this.gridSize + 'px';
+    strawberry.div.style.left = this.offsetX + this.snakeSize * strawberry.x + 'px';
+    strawberry.div.style.top = this.offsetY + this.snakeSize * strawberry.y + 'px';
+    strawberry.div.style.width = this.snakeSize + 'px';
+    strawberry.div.style.height = this.snakeSize + 'px';
 
     strawberry.name = 'strawberry';
     strawberry.points = 3;
@@ -515,10 +517,10 @@ class Game {
     let banana = this.createFruit();
 
     banana.div.className = 'banana';
-    banana.div.style.left = this.offsetX + this.gridSize * banana.x + 'px';
-    banana.div.style.top = this.offsetY + this.gridSize * banana.y + 'px';
-    banana.div.style.width = this.gridSize + 'px';
-    banana.div.style.height = this.gridSize + 'px';
+    banana.div.style.left = this.offsetX + this.snakeSize * banana.x + 'px';
+    banana.div.style.top = this.offsetY + this.snakeSize * banana.y + 'px';
+    banana.div.style.width = this.snakeSize + 'px';
+    banana.div.style.height = this.snakeSize + 'px';
 
     banana.name = 'banana';
     banana.points = 5;
@@ -613,7 +615,6 @@ class Game {
     }
     
     this.keys.push(buttonDirection);
-
   }
 
   checkKeys() {
@@ -634,7 +635,7 @@ class Game {
   }
 
   gameOver() {
-    const fieldHeight = this.height * this.gridSize;
+    const fieldHeight = this.height * this.snakeSize;
     if (fieldHeight <= 170) {
       this.stats.gameOverMessage.style.fontSize = '26px';
     }
@@ -687,8 +688,6 @@ class Game {
   }
 
   touchScreenSteering() {
-    this.startX;
-    this.startY;
     this.listenField = document.getElementsByClassName('field')[0];
     this.listenField.addEventListener('touchstart', this.touchStart);
     this.listenField.addEventListener('touchmove', this.preventDefaultSlide)
@@ -726,7 +725,7 @@ class Game {
       this.obstacles[i].div.remove();
     }
     this.length = this.startLength;
-    this.snake = new Snake(this.field, this.length, this.gridSize, this.offsetX, this.offsetY);
+    this.snake = new Snake(this.field, this.length, this.snakeSize, this.offsetX, this.offsetY);
     this.points = 0;
     this.keys = [];
     this.obstacles = [];
@@ -740,46 +739,23 @@ class Game {
     this.createObstacle();
     document.getElementsByClassName('game-over-message')[0].style = 'none';
     document.addEventListener('keydown', this.handleKeyPress);
-    this.arrowButtons.upButton.addEventListener('click', this.upButton);
-    this.arrowButtons.downButton.addEventListener('click', this.downButton);
-    this.arrowButtons.leftButton.addEventListener('click', this.leftButton);
-    this.arrowButtons.rightButton.addEventListener('click', this.rightButton);
+    this.stats.upButton.addEventListener('click', this.upButton);
+    this.stats.downButton.addEventListener('click', this.downButton);
+    this.stats.leftButton.addEventListener('click', this.leftButton);
+    this.stats.rightButton.addEventListener('click', this.rightButton);
     this.touchScreenSteering();
   }
 }
 
-const settings = () => {
-  const screenWidth = window.innerWidth;
-  const screenHeight = window.innerHeight;
-  const settings = document.getElementById('settings');
-  const userName = document.getElementById('user-name').value;
-  const level = document.getElementById('level').value;
-  const fieldSize = document.getElementById('field-size').value;
-  const border = 1
-  let snakeSize = 30;
-  let margin = 10;
-  if (screenWidth <= 800) {
-    snakeSize = (screenWidth - margin) / fieldSize;
-  }
-  const offsetX = (screenWidth - fieldSize * snakeSize) / 2;
-  const offsetY = 2;
-  let statsHeight = 250;
-  if (screenWidth <= 800) {
-    statsHeight = screenHeight - (fieldSize * snakeSize) - (offsetY * 2);
-  }
-  const game = new Game(fieldSize, statsHeight, snakeSize, offsetX, offsetY, border, level, userName);
-  game.stats.button.addEventListener('click', game.start);
-  settings.remove();
-}
-
-const userNameValidation = () => {  
+const formValidation = () => {  
   const userName = document.getElementById('user-name').value;
   
-  if (userName.length < 5) {
+  if (userName.length < 3) {
     return
   }
-  settings();
+  const game = new Game(userName);
+  game.stats.button.addEventListener('click', game.start);
 }
 
 const submit = document.getElementById('submit');
-const listenSubmit = submit.addEventListener('click', userNameValidation)
+const listenSubmit = submit.addEventListener('click', formValidation);

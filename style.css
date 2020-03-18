@@ -174,15 +174,18 @@ html,body {
 
 .game-over-message {
   display: none;
+  justify-content: center;
   text-align: center;
   z-index: 3;
   font-size: 48px;
   font-weight: 700;
+  width: 100%;
   margin: 0;
   padding: 5px;
   color: #00d;
   background: rgba(102, 102, 102, 0.7);
-  border: 1px solid #000;
+  border-top: 1px solid #000;
+  border-bottom: 1px solid #000;
 }
 
 #settings {

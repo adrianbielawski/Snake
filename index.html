@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1">
     <title>Snake</title>
     <link href="style.css" rel="stylesheet" type="text/css" />
     <link href="./assets/fonts/css/all.css" rel="stylesheet">
@@ -10,7 +11,7 @@
   <body>
     <form id="settings">
       <label for="user-name">Your name</label>
-      <input type="text" id="user-name" name="user-name" minlength="5" placeholder="Min. 5 characters" required oninvalid="this.setCustomValidity('This field require min 5 characters')" onchange="this.setCustomValidity('')">
+      <input type="text" id="user-name" name="user-name" minlength="3" placeholder="Min. 3 characters" required oninvalid="this.setCustomValidity('This field require min 3 characters')" onchange="this.setCustomValidity('')">
       <label for="level">Choose level</label>
       <select id="level" name="level">
         <option value="easy">Easy</option>

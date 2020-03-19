@@ -107,6 +107,12 @@ class Stats {
     this.statsDiv.style.left = this.offsetX - this.border + 'px';
     this.statsDiv.style.border = `${this.border}px solid #000`;
     this.statsDiv.style.height = `${this.statsHeight}px`;
+    
+    this.timerSpace = document.createElement('div');
+    this.timerSpace.className = 'timer-space';
+    this.timer = document.createElement('div');
+    this.timer.className = 'timer';
+    this.timerSpace.appendChild(this.timer);
 
     this.scores = document.createElement('div');
     this.scores.className = 'scores';
@@ -155,6 +161,7 @@ class Stats {
     this.arrowButtonsDiv.appendChild(this.downButton);
     this.arrowButtonsDiv.appendChild(this.leftButton);
     this.arrowButtonsDiv.appendChild(this.rightButton);
+    this.statsDiv.appendChild(this.timerSpace);
     this.statsDiv.appendChild(this.scores);
     this.statsDiv.appendChild(this.button);
     this.statsDiv.appendChild(this.arrowButtonsDiv);
@@ -185,6 +192,7 @@ class Game {
     this.bestScore = 0;
     this.oldBestScore = 0;
     this.removedFruits = 0;
+    this.destroyObstacles = false;
     this.startLength = this.startLength();
     this.length = this.startLength;
     this.startSpeed = this.startSpeed();
@@ -202,7 +210,7 @@ class Game {
   }
 
   getSnakeSize() {
-    if (this.screenWidth < 800) {
+    if (this.screenWidth <= 800) {
       return (this.screenWidth - this.margin) / this.fieldSize;
     } else {
       return 25;
@@ -210,7 +218,7 @@ class Game {
   }  
 
   getStatsHeight() {
-    if (this.screenWidth < 800) {
+    if (this.screenWidth <= 800) {
       return this.screenHeight - (this.fieldSize * this.snakeSize) - (this.offsetY * 2);
     } else {
       return 250;
@@ -250,9 +258,11 @@ class Game {
       }
     }
 
-    for (let i = 0; i < this.obstacles.length; i++) {
-      if (x == this.obstacles[i].x && y == this.obstacles[i].y) {
-        return false
+    if (this.destroyObstacles == false) {
+      for (let i = 0; i < this.obstacles.length; i++) {
+        if (x == this.obstacles[i].x && y == this.obstacles[i].y) {
+          return false
+        }
       }
     }
     return true
@@ -276,6 +286,19 @@ class Game {
         this.removeFruit(i);
       }
     }
+
+    if (this.destroyObstacles == true) {
+      for (let i = 0; i < this.obstacles.length; i++) {
+        if (x == this.obstacles[i].x && y == this.obstacles[i].y) {
+          this.removeObstacle(i);
+        }
+      }
+    }
+  }
+
+  removeObstacle = (i) => {
+    this.obstacles[i].div.remove();
+    this.obstacles.splice([i], 1);
   }
 
   removeFruit(i) {
@@ -289,13 +312,15 @@ class Game {
 
     if (removedFruit[0].name == 'banana') {
       clearTimeout(this.bananaTimeout);
+      this.stats.timer.style.visibility = 'unset';
+      this.startDestroyObstacle = this.destroyObstacle();
     }
 
     let value = removedFruit[0].points;    
 
-    if (this.removedFruits % 4 == 0) {
+    if (this.removedFruits % 3 == 0) {
       this.createStrawberry();
-    } else if (this.removedFruits % 7 == 0) {
+    } else if (this.removedFruits % 5 == 0) {
       this.createBanana();
     } else {
       this.createApple();
@@ -307,6 +332,18 @@ class Game {
     if (this.removedFruits % 2 == 0) {
       this.accelerateSnake();
     }
+  }
+
+  destroyObstacle() {
+    this.destroyObstacles = true;
+    this.stats.timer.classList.add('start-timer');
+    this.destroyObstacleTime = setTimeout(this.stopDestroyObstacle, 5000);
+  }
+
+  stopDestroyObstacle = () => {
+    this.destroyObstacles = false;
+    this.stats.timer.style.visibility = 'hidden';
+    this.stats.timer.classList.remove('start-timer');
   }
 
   accelerateSnake() {

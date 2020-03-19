@@ -64,6 +64,27 @@ html,body {
   background: #f00;
 }
 
+.timer-space {
+  width: 100%;
+  border-top: 5px solid #f00;
+  border-left: 2px solid transparent;
+  border-right: 2px solid transparent;
+}
+
+.timer {
+  position: absolute;
+  visibility: hidden;
+  width: 100%;
+  top: 0;
+  right: 0;
+  border-top: 5px solid blue;
+}
+
+.start-timer {
+  width: 0;
+  transition: linear 5s;
+}
+
 .points {
   margin: 0 2px;
   color: #fff;
